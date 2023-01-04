@@ -25,11 +25,25 @@ df
 # COMMAND ----------
 
 columns_to_select = ['longitude', 'latitude', 'time', 'date', 'speedkph', 'speedkphdelta', 'drivingdirection']
-df[:, columns_to_select].head(100)
+bus_route_302 = df[:, columns_to_select].head(100)
 
 # COMMAND ----------
 
-df[:, count(f.time), by('longitude', 'latitude', 'time', 'date', 'speedkph', 'speedkphdelta', 'drivingdirection')]
+bus_route_302 = df[:, count(f.time), by('longitude', 'latitude', 'time', 'date', 'speedkph', 'speedkphdelta', 'drivingdirection')]
+
+# COMMAND ----------
+
+bus_route_302 = df[f.drivingdirection == 302, :]
+
+
+# COMMAND ----------
+
+
+bus_route_302.sort('time')   
+
+# COMMAND ----------
+
+bus_route_302[f.speedkph > 10, :]
 
 # COMMAND ----------
 
