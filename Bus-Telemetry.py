@@ -7,12 +7,31 @@ import numpy as np
 import pandas as pd
 import pyspark.pandas as ps
 import datatable as dt 
+import pyspark.pandas as ps
 
 # COMMAND ----------
 
 
 from datatable import (dt, f, by, ifelse, update, sort,
                        count, min, max, mean, sum, rowsum)
+
+# COMMAND ----------
+
+#set the data lake file location:
+file_location = "adl://adlsanalyticsprd001.azuredatalakestore.net/curated/surface/busesbi/speed/2022/12/01/busspeeds_20221201.csv"
+#read in the data to dataframe df
+df = spark.read.format("csv").option("inferSchema", "true").option("header",
+"true").option("delimiter",",").load(file_location)
+ 
+#display the dataframe
+display(df)
+
+
+
+# COMMAND ----------
+
+path = "adl://adlsanalyticsprd001.azuredatalakestore.net/curated/surface/busesbi/speed/2022/12/01/busspeeds_20221201.csv"
+df = spark.read.option("header", "true").option("delimiter", "\t").format("csv").load(path).createOrReplaceTempView("BusSpeedSample")
 
 # COMMAND ----------
 
@@ -41,6 +60,7 @@ bus_route_302 = df[f.drivingdirection == 302, :]
 
 bus_route_302.sort('time')   
 
+
 # COMMAND ----------
 
 bus_route_302[f.speedkph > 10, :]
@@ -55,11 +75,11 @@ bus_route_302[f.speedkph > 10, :]
 # MAGIC   "dfs.adls.oauth2.refresh.url" -> "https://login.microsoftonline.com/1fbd65bf-5def-4eea-a692-a089c255346b")
 # MAGIC 
 # MAGIC dbutils.fs.mount(
-# MAGIC   source = "adl://kpadls.azuredatalakestore.net/",
-# MAGIC   mountPoint = "",
+# MAGIC   source = "adl://adlsanalyticsprd001.azuredatalakestore.net/curated/surface/busesbi/speed/2022/12/01/busspeeds_20221201.csv",
+# MAGIC   mountPoint = "/mnt/bus_acc",
 # MAGIC   extraConfigs = configs)
 
 # COMMAND ----------
 
 # MAGIC %scala
-# MAGIC ls /mnt/kp-adls-testing
+# MAGIC ls /mnt/kp-adl
