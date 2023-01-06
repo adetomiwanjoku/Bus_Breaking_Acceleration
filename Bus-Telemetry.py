@@ -7,13 +7,6 @@ import numpy as np
 import pandas as pd
 import pyspark.pandas as ps
 import datatable as dt 
-import pyspark.pandas as ps
-
-# COMMAND ----------
-
-
-from datatable import (dt, f, by, ifelse, update, sort,
-                       count, min, max, mean, sum, rowsum)
 
 # COMMAND ----------
 
@@ -24,6 +17,7 @@ df = spark.read.format("csv").option("inferSchema", "true").option("header",
 "true").option("delimiter",",").load(file_location)
  
 #display the dataframe
+
 display(df)
 
 
@@ -31,39 +25,28 @@ display(df)
 # COMMAND ----------
 
 path = "adl://adlsanalyticsprd001.azuredatalakestore.net/curated/surface/busesbi/speed/2022/12/01/busspeeds_20221201.csv"
-df = spark.read.option("header", "true").option("delimiter", "\t").format("csv").load(path).createOrReplaceTempView("BusSpeedSample")
+df = spark.read.option("header", "true").option("delimiter", "\t").format("csv").load(path)#.createOrReplaceTempView("BusSpeedSample")
 
 # COMMAND ----------
 
-df = dt.fread('/dbfs/FileStore/sedona/part_00000_tid_4841385668007278789_e1fd6717_0ce4_44d3_ac2e_983397c4b9ff_27255_1_c000.csv')
+df.display()
 
 # COMMAND ----------
 
-df
+select_df = df.select('longitude', 'latitude', 'time', 'date', 'speedkph', 'speedkphdelta', 'drivingdirection')
 
 # COMMAND ----------
 
-columns_to_select = ['longitude', 'latitude', 'time', 'date', 'speedkph', 'speedkphdelta', 'drivingdirection']
-bus_route_302 = df[:, columns_to_select].head(100)
+select_df.display()
 
 # COMMAND ----------
 
-bus_route_302 = df[:, count(f.time), by('longitude', 'latitude', 'time', 'date', 'speedkph', 'speedkphdelta', 'drivingdirection')]
+filtered_df = select_df.filter("drivingdirection = 302")
 
 # COMMAND ----------
 
-bus_route_302 = df[f.drivingdirection == 302, :]
+filtered_df.display()
 
-
-# COMMAND ----------
-
-
-bus_route_302.sort('time')   
-
-
-# COMMAND ----------
-
-bus_route_302[f.speedkph > 10, :]
 
 # COMMAND ----------
 
@@ -76,10 +59,5 @@ bus_route_302[f.speedkph > 10, :]
 # MAGIC 
 # MAGIC dbutils.fs.mount(
 # MAGIC   source = "adl://adlsanalyticsprd001.azuredatalakestore.net/curated/surface/busesbi/speed/2022/12/01/busspeeds_20221201.csv",
-# MAGIC   mountPoint = "/mnt/bus_acc",
+# MAGIC   mountPoint = "/mnt/bus_acc_break",
 # MAGIC   extraConfigs = configs)
-
-# COMMAND ----------
-
-# MAGIC %scala
-# MAGIC ls /mnt/kp-adl
