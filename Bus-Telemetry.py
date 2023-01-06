@@ -10,20 +10,6 @@ import datatable as dt
 
 # COMMAND ----------
 
-#set the data lake file location:
-file_location = "adl://adlsanalyticsprd001.azuredatalakestore.net/curated/surface/busesbi/speed/2022/12/01/busspeeds_20221201.csv"
-#read in the data to dataframe df
-df = spark.read.format("csv").option("inferSchema", "true").option("header",
-"true").option("delimiter",",").load(file_location)
- 
-#display the dataframe
-
-display(df)
-
-
-
-# COMMAND ----------
-
 path = "adl://adlsanalyticsprd001.azuredatalakestore.net/curated/surface/busesbi/speed/2022/12/01/busspeeds_20221201.csv"
 df = spark.read.option("header", "true").option("delimiter", "\t").format("csv").load(path)#.createOrReplaceTempView("BusSpeedSample")
 
@@ -33,7 +19,7 @@ df.display()
 
 # COMMAND ----------
 
-select_df = df.select('longitude', 'latitude', 'time', 'date', 'speedkph', 'speedkphdelta', 'drivingdirection')
+select_df = df.select('longitude', 'latitude', 'time', 'date', 'speedkph', 'speedkphdelta', 'drivingdirection', 'filedate')
 
 # COMMAND ----------
 
@@ -45,8 +31,34 @@ filtered_df = select_df.filter("drivingdirection = 302")
 
 # COMMAND ----------
 
+df_1 = filtered_df.filter("filedate = 20221128")
+
+# COMMAND ----------
+
+df_1.display()
+
+# COMMAND ----------
+
+df_1.orderBy('time').show()
+
+# COMMAND ----------
+
 filtered_df.display()
 
+
+# COMMAND ----------
+
+filtered_df.orderBy("date")
+filtered_df.orderBy("time")
+
+# COMMAND ----------
+
+df.orderBy("time","date").show(truncate=False)
+
+
+# COMMAND ----------
+
+filtered_df.display()
 
 # COMMAND ----------
 
