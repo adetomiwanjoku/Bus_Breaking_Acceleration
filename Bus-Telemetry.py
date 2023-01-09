@@ -1,17 +1,23 @@
 # Databricks notebook source
-pip install datatable
-
-# COMMAND ----------
-
 import numpy as np
 import pandas as pd
 import pyspark.pandas as ps
-import datatable as dt 
+import datatable as dt
+from pyspark.sql.functions import col
 
 # COMMAND ----------
 
 path = "adl://adlsanalyticsprd001.azuredatalakestore.net/curated/surface/busesbi/speed/2022/12/01/busspeeds_20221201.csv"
-df = spark.read.option("header", "true").option("delimiter", "\t").format("csv").load(path)#.createOrReplaceTempView("BusSpeedSample")
+df = (
+    spark.read.option("header", "true")
+    .option("delimiter", "\t")
+    .format("csv")
+    .load(path)
+)  # .createOrReplaceTempView("BusSpeedSample") #read in data
+
+# COMMAND ----------
+
+ df.selectExpr("cast(speedkph as double) speedkph")
 
 # COMMAND ----------
 
@@ -19,7 +25,18 @@ df.display()
 
 # COMMAND ----------
 
-select_df = df.select('longitude', 'latitude', 'time', 'date', 'speedkph', 'speedkphdelta', 'drivingdirection', 'filedate')
+select_df = df.select(
+    "longitude",
+    "latitude",
+    "time",
+    "date",
+    "speedkph",
+    "speedkphdelta",
+    "drivingdirection",
+    "filedate",
+    "registrationnumber"
+)
+#select these columns 
 
 # COMMAND ----------
 
@@ -27,38 +44,22 @@ select_df.display()
 
 # COMMAND ----------
 
-filtered_df = select_df.filter("drivingdirection = 302")
+
+select_df.select("registrationnumber").distinct().show() # shows the distinct values
 
 # COMMAND ----------
 
-df_1 = filtered_df.filter("filedate = 20221128")
+df_1 = select_df.filter(select_df.registrationnumber == 'LG21JBE').display() #only this registration number shows a single bus
 
 # COMMAND ----------
 
-df_1.display()
-
-# COMMAND ----------
-
-df_1.orderBy('time').show()
-
-# COMMAND ----------
-
-filtered_df.display()
-
-
-# COMMAND ----------
-
-filtered_df.orderBy("date")
-filtered_df.orderBy("time")
-
-# COMMAND ----------
-
-df.orderBy("time","date").show(truncate=False)
-
-
-# COMMAND ----------
-
-filtered_df.display()
+X = []
+for j in range(len(select_df.speedkphdelta)):
+    if df_1.speedkphdeltalen(range(A)) != 0 and df_1.speedkphdeltalen(range(A +1)) != 0:
+        X.append(A[j])
+    else:
+        print('lol')
+print(X)
 
 # COMMAND ----------
 
